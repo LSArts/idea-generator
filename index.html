@@ -23,11 +23,8 @@
     h3 {
       margin-top: 25px;
     }
-    li a {
-      color: #3366cc;
-      text-decoration: none;
-    }
-    li a:hover {
+    a {
+      color: blue;
       text-decoration: underline;
     }
   </style>
@@ -47,7 +44,7 @@
     <ul id="rhymeList"></ul>
     
     <h3>Idioms</h3>
-    <ul id="idiomList"></ul>
+    <div id="idiomLink"></div>
   </div>
 
   <script>
@@ -57,27 +54,24 @@
 
       document.getElementById("relatedList").innerHTML = "<li>Loading...</li>";
       document.getElementById("rhymeList").innerHTML = "<li>Loading...</li>";
-      document.getElementById("idiomList").innerHTML = "<li>Loading...</li>";
+      document.getElementById("idiomLink").innerHTML = "Loading...";
 
-      try {
-        const [relatedRes, rhymeRes] = await Promise.all([
-          fetch(`https://api.datamuse.com/words?ml=${word}`),
-          fetch(`https://api.datamuse.com/words?rel_rhy=${word}`)
-        ]);
+      // Fetch related and rhyming words
+      const related = await fetch(`https://api.datamuse.com/words?ml=${word}`)
+        .then(res => res.json()).catch(() => []);
+      const rhymes = await fetch(`https://api.datamuse.com/words?rel_rhy=${word}`)
+        .then(res => res.json()).catch(() => []);
 
-        const related = await relatedRes.json();
-        const rhymes = await rhymeRes.json();
+      displayList("relatedList", related.map(w => w.word).slice(0, 10));
+      displayList("rhymeList", rhymes.map(w => w.word).slice(0, 10));
 
-        displayList("relatedList", related.map(w => w.word).slice(0, 10));
-        displayList("rhymeList", rhymes.map(w => w.word).slice(0, 10));
-        displayIdioms(word);
-
-      } catch (err) {
-        console.error(err);
-        document.getElementById("relatedList").innerHTML = "<li>Error loading related words.</li>";
-        document.getElementById("rhymeList").innerHTML = "<li>Error loading rhymes.</li>";
-        document.getElementById("idiomList").innerHTML = "<li>Error loading idioms.</li>";
-      }
+      // Set idiom link
+      const idiomDiv = document.getElementById("idiomLink");
+      idiomDiv.innerHTML = `
+        <a href="https://idioms.thefreedictionary.com/${encodeURIComponent(word)}" target="_blank">
+          Search idioms for "${word}" on TheFreeDictionary
+        </a>
+      `;
     }
 
     function displayList(id, items) {
@@ -92,18 +86,6 @@
         li.textContent = item;
         list.appendChild(li);
       });
-    }
-
-    function generate() {
-      const word = document.getElementById("word").value.trim();
-      const idiomSearch = document.getElementById("idiomSearchLink");
-
-      if (word) {
-        idiomSearch.href = "https://idioms.thefreedictionary.com/" + encodeURIComponent(word);
-        idiomSearch.innerText = `Search Idioms for "${word}"`;
-      } else {
-        idiomSearch.href = "#";
-        idiomSearch.innerText = "Search Idioms";
     }
   </script>
 </body>
