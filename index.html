@@ -94,33 +94,16 @@
       });
     }
 
-    function displayIdioms(word) {
-      const idiomList = document.getElementById("idiomList");
-      idiomList.innerHTML = "";
+    function generate() {
+      const word = document.getElementById("word").value.trim();
+      const idiomSearch = document.getElementById("idiomSearchLink");
 
-      const phrases = [
-        `a touch of ${word}`,
-        `in the face of ${word}`,
-        `the ${word} effect`,
-        `caught in ${word} crossfire`,
-        `no ${word}, no glory`,
-        `between a rock and ${word}`,
-        `make way for ${word}`,
-        `the art of ${word}`,
-        `the road to ${word}`,
-        `mastering the ${word} game`
-      ];
-
-      phrases.forEach(phrase => {
-        const li = document.createElement("li");
-        const a = document.createElement("a");
-        a.href = `https://idioms.thefreedictionary.com/${encodeURIComponent(phrase)}`;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        a.textContent = phrase;
-        li.appendChild(a);
-        idiomList.appendChild(li);
-      });
+      if (word) {
+        idiomSearch.href = "https://idioms.thefreedictionary.com/" + encodeURIComponent(word);
+        idiomSearch.innerText = `Search Idioms for "${word}"`;
+      } else {
+        idiomSearch.href = "#";
+        idiomSearch.innerText = "Search Idioms";
     }
   </script>
 </body>
