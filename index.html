@@ -7,49 +7,69 @@
     body {
       font-family: Arial, sans-serif;
       padding: 20px;
-      max-width: 500px;
+      max-width: 600px;
       margin: auto;
     }
-    input {
+    input, button {
       width: 100%;
       padding: 10px;
       font-size: 16px;
-    }
-    button {
       margin-top: 10px;
-      padding: 10px;
-      font-size: 16px;
-      width: 100%;
+    }
+    .result {
+      margin-top: 20px;
+    }
+    h3 {
+      margin-bottom: 5px;
+      color: #444;
     }
     a {
-      display: block;
-      margin-top: 20px;
-      color: blue;
-      font-size: 16px;
+      color: #007BFF;
       text-decoration: underline;
     }
   </style>
 </head>
 <body>
   <h2>Idea Generator</h2>
-  <label for="word">Enter a word:</label>
-  <input type="text" id="word" placeholder="e.g., danger" />
+  <input type="text" id="wordInput" placeholder="Enter a word..." />
   <button onclick="generate()">Generate</button>
 
-  <a id="idiomSearchLink" href="#" target="_blank">Search Idioms</a>
+  <div class="result" id="relatedContainer">
+    <h3>Related Words</h3>
+    <p id="relatedWords">-</p>
+  </div>
+
+  <div class="result" id="rhymeContainer">
+    <h3>Rhyming Words</h3>
+    <p id="rhymingWords">-</p>
+  </div>
+
+  <div class="result" id="idiomContainer">
+    <h3>Idioms</h3>
+    <p><a id="idiomLink" href="#" target="_blank">Search Idioms</a></p>
+  </div>
 
   <script>
-    function generate() {
-      const word = document.getElementById("word").value.trim();
-      const idiomSearch = document.getElementById("idiomSearchLink");
+    async function generate() {
+      const word = document.getElementById("wordInput").value.trim();
+      if (!word) return;
 
-      if (word) {
-        idiomSearch.href = "https://idioms.thefreedictionary.com/" + encodeURIComponent(word);
-        idiomSearch.innerText = `Search Idioms for "${word}"`;
-      } else {
-        idiomSearch.href = "#";
-        idiomSearch.innerText = "Search Idioms";
-      }
+      // Update idiom link
+      const idiomLink = document.getElementById("idiomLink");
+      idiomLink.href = "https://idioms.thefreedictionary.com/" + encodeURIComponent(word);
+      idiomLink.textContent = `Search idioms for "${word}"`;
+
+      // Fetch related words
+      const relatedResponse = await fetch(`https://api.datamuse.com/words?ml=${encodeURIComponent(word)}`);
+      const relatedData = await relatedResponse.json();
+      const relatedWords = relatedData.slice(0, 10).map(item => item.word).join(', ');
+      document.getElementById("relatedWords").textContent = relatedWords || 'No related words found.';
+
+      // Fetch rhyming words
+      const rhymeResponse = await fetch(`https://api.datamuse.com/words?rel_rhy=${encodeURIComponent(word)}`);
+      const rhymeData = await rhymeResponse.json();
+      const rhymingWords = rhymeData.slice(0, 10).map(item => item.word).join(', ');
+      document.getElementById("rhymingWords").textContent = rhymingWords || 'No rhymes found.';
     }
   </script>
 </body>
