@@ -1,97 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
   <title>Idea Generator</title>
   <style>
     body {
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
       padding: 20px;
-      max-width: 600px;
+      max-width: 500px;
       margin: auto;
     }
-    input, button {
-      font-size: 18px;
-      padding: 10px;
+    input {
       width: 100%;
-      margin-bottom: 15px;
+      padding: 10px;
+      font-size: 16px;
     }
-    .output {
+    button {
+      margin-top: 10px;
+      padding: 10px;
+      font-size: 16px;
+      width: 100%;
+    }
+    a {
+      display: block;
       margin-top: 20px;
-    }
-    h3 {
-      margin-top: 25px;
+      color: blue;
+      font-size: 16px;
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <h1>Idea Generator</h1>
-  <p>Enter a word and get Rhymes, Related Words, and Idioms.</p>
-  
-  <input type="text" id="inputWord" placeholder="Type your base word here..." />
-  <button onclick="generateIdeas()">Generate Ideas</button>
-  
-  <div class="output">
-    <h3>Related Words</h3>
-    <ul id="relatedList"></ul>
-    
-    <h3>Rhyming Words</h3>
-    <ul id="rhymeList"></ul>
-    
-    <h3>Idioms</h3>
-    <ul id="idiomList"></ul>
-  </div>
+  <h2>Idea Generator</h2>
+  <label for="word">Enter a word:</label>
+  <input type="text" id="word" placeholder="e.g., danger" />
+  <button onclick="generate()">Generate</button>
+
+  <a id="idiomSearchLink" href="#" target="_blank">Search Idioms</a>
 
   <script>
-    async function generateIdeas() {
-      const word = document.getElementById("inputWord").value.trim();
-      if (!word) return alert("Please enter a word!");
+    function generate() {
+      const word = document.getElementById("word").value.trim();
+      const idiomSearch = document.getElementById("idiomSearchLink");
 
-      document.getElementById("relatedList").innerHTML = "<li>Loading...</li>";
-      document.getElementById("rhymeList").innerHTML = "<li>Loading...</li>";
-      document.getElementById("idiomList").innerHTML = "<li>Loading...</li>";
-
-      // Fetch related words from Datamuse API
-      const related = await fetch(`https://api.datamuse.com/words?ml=${word}`)
-        .then(res => res.json()).catch(() => []);
-      const rhymes = await fetch(`https://api.datamuse.com/words?rel_rhy=${word}`)
-        .then(res => res.json()).catch(() => []);
-
-      const idioms = generateFakeIdioms(word); // Fake idiom generator
-
-      displayList("relatedList", related.map(w => w.word).slice(0, 10));
-      displayList("rhymeList", rhymes.map(w => w.word).slice(0, 10));
-      displayList("idiomList", idioms);
-    }
-
-    function displayList(id, items) {
-      const list = document.getElementById(id);
-      list.innerHTML = "";
-      if (items.length === 0) {
-        list.innerHTML = "<li>No results found.</li>";
-        return;
+      if (word) {
+        idiomSearch.href = "https://idioms.thefreedictionary.com/" + encodeURIComponent(word);
+        idiomSearch.innerText = `Search Idioms for "${word}"`;
+      } else {
+        idiomSearch.href = "#";
+        idiomSearch.innerText = "Search Idioms";
       }
-      items.forEach(item => {
-        const li = document.createElement("li");
-        li.textContent = item;
-        list.appendChild(li);
-      });
-    }
-
-    function generateFakeIdioms(word) {
-      return [
-        `A touch of ${word}`,
-        `In the face of ${word}`,
-        `The ${word} effect`,
-        `Caught in ${word} crossfire`,
-        `No ${word}, no glory`,
-        `Between a rock and ${word}`,
-        `Make way for ${word}`,
-        `The art of ${word}`,
-        `The road to ${word}`,
-        `Mastering the ${word} game`
-      ];
     }
   </script>
 </body>
